@@ -1,4 +1,10 @@
 FROM tiangolo/uwsgi-nginx-flask:python3.8
+
+RUN apt update && apt upgrade -y && apt install -y aptitude swig libssl-dev
+RUN aptitude install mecab libmecab-dev mecab-ipadic-utf8 git make curl xz-utils file -y
+ENV GIT_SSL_NO_VERIFY 1 # なんでかcloneできないので取り急ぎ。
+RUN git clone --depth 1 https://github.com/neologd/mecab-ipadic-neologd.git
+RUN echo yes | mecab-ipadic-neologd/bin/install-mecab-ipadic-neologd -n -a
 COPY ./backend /app
 COPY ./requirements.txt /app
 WORKDIR /app
