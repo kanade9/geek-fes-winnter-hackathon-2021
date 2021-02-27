@@ -30,7 +30,7 @@ def getSentence(url):
         return ""
     try:
         page = requests.get(url)
-        soup = BeautifulSoup(page.content)
+        soup = BeautifulSoup(page.content, "html.parser")
         texts = [s.getText().strip() for s in soup.find_all("p")]
         return texts
     except:
