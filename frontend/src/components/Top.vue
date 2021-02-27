@@ -15,7 +15,7 @@
             </div>
           </v-row>
           <v-row>
-            <v-textarea counter></v-textarea>
+            <v-textarea counter v-model="text"></v-textarea>
           </v-row>
           <v-row>
             <v-btn elevation="5" large color="success" @click="post_random()">検索する</v-btn>
@@ -49,6 +49,7 @@ export default {
   name: "Top",
   data() {
     return {
+      text: "",
       random_list: [],
       list_str: '{"kw": ["フロント", "深層学習"]}',
     };
@@ -58,8 +59,9 @@ export default {
   },
   methods: {
     post_random: async function () {
+      text_json_str = '{"text":' + '"' + this.text + '"}';
       await axios
-        .post("http://localhost/random", this.list_str, {
+        .post("http://localhost/random", text_json_str, {
           headers: { "Content-Type": "application/json" },
         })
         .then((response) => {
