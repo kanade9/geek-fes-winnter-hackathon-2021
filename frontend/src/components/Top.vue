@@ -1,21 +1,41 @@
 <template>
   <div class="top">
-    <h1> 技育祭おすすめ講演レコメンダー</h1>
-    <h3 style='padding: 3rem;'> このボタンを押すとおすすめの講演を表示します </h3>
-    <v-btn small color="primary" @click="post_random()">ランダムに表示する</v-btn>
-    <h2 style='padding: 4rem;'>あなたにおすすめの講演はこれだ！！</h2>
     <v-container>
-      <v-row align="center" wrap>
-        <v-col lg="12">
-          <v-card v-for="(data,key) in random_list" :key="key" style='margin: 1rem;'>
-            <v-card-title class="justify-center" style="font-weight:bold">
-              {{ data.title}}  
+      <v-row>
+        <v-col lg="6">
+          <v-row>
+            <h1>技育祭おすすめ講演</h1>
+            <br />
+            <h1>レコメンダー</h1>
+          </v-row>
+          <v-row>
+            <div class="description">
+              誰の講演を聞こうかと迷っている方へ、おすすめの講演をAIによってレコメンドします。
+              興味のあるワードを含んだ文章を入力してみてください！
+            </div>
+          </v-row>
+          <v-row>
+            <v-textarea counter></v-textarea>
+          </v-row>
+          <v-row>
+            <v-btn elevation="5" large color="success" @click="post_random()">検索する</v-btn>
+          </v-row>
+        </v-col>
+        <v-col lg="6">
+          <v-card
+            v-for="(data, key) in random_list"
+            :key="key"
+            style="margin: 1rem"
+          >
+            <v-card-title class="justify-center" style="font-weight: bold">
+              {{ data.title }}
             </v-card-title>
-              <br>
-              {{ data.name }}
-              <br>
-              {{ data.start_time}} から {{ data.end_time}} 会場: {{ data.hall_no}}
-              <br>
+            <br />
+            {{ data.name }}
+            <br />
+            {{ data.start_time }} から {{ data.end_time }} 会場:
+            {{ data.hall_no }}
+            <br />
           </v-card>
         </v-col>
       </v-row>
@@ -24,58 +44,48 @@
 </template>
 
 <script>
-import axios from 'axios'
+import axios from "axios";
 export default {
-  name: 'Top',
+  name: "Top",
   data() {
-    return{
-     random_list: [],
-     list_str: '{"kw": ["フロント", "深層学習"]}'
-    }
+    return {
+      random_list: [],
+      list_str: '{"kw": ["フロント", "深層学習"]}',
+    };
   },
   props: {
-    msg: String
+    msg: String,
   },
   methods: {
     post_random: async function () {
-      await axios.post('http://localhost/random', this.list_str, {
-        headers: {"Content-Type": "application/json"}
-      })
-      .then(response => {
-        // alert(response.data);
-        this.random_list = response.data;
+      await axios
+        .post("http://localhost/random", this.list_str, {
+          headers: { "Content-Type": "application/json" },
         })
-      .catch(error => {
-        alert(error);
+        .then((response) => {
+          // alert(response.data);
+          this.random_list = response.data;
         })
-      },
+        .catch((error) => {
+          alert(error);
+        });
+    },
     get_random: async function () {
-      await axios.get('http://localhost/')
-      .then(response => {
-        alert(response.statusText);
+      await axios
+        .get("http://localhost/")
+        .then((response) => {
+          alert(response.statusText);
         })
-      .catch(error => {
-        alert(error);
-        })
-      },
-  }
-}
+        .catch((error) => {
+          alert(error);
+        });
+    },
+  },
+};
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
+/* .top { */
+    /* background-image: url("~@/assets/bg_a.jpg"); */
+  /* } */
 </style>
