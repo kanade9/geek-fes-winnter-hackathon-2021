@@ -4,6 +4,7 @@ import csv
 import os
 import random
 import datetime
+from flask_cors import CORS
 
 
 
@@ -19,6 +20,7 @@ def read_ccv_to_dict(path: str):
     return dic_performers
 
 app = Flask(__name__)
+CORS(app)
 path_csv = os.path.join("..", 'data', 'performers_list.csv')
 dict_performers = read_ccv_to_dict(path_csv)
 n_performers = len(dict_performers)
