@@ -20,7 +20,11 @@ class TestFlask:
         ] , 
     "test_chokudai":[
         dict(url="http://0.0.0.0:80")
-        ] }
+        ] ,
+    "test_random":[
+        dict(url="http://0.0.0.0:80")   
+        ], 
+    }
 
     def test_hello(self, url):
         response = requests.get(url)
@@ -32,5 +36,15 @@ class TestFlask:
     def test_chokudai(self, url):
         url += "/chokudai"
         dic = {"kw": ["フロント", "深層学習"]}
-        response = requests.post(url, json.dumps(dic),  headers={'Content-Type': 'application/json'})
+        response = requests.post(url, json.dumps(dic),headers={'Content-Type': 'application/json'})
+        print(response.headers)
+        print(response.url)
+        print(response.json())
+
+    def test_random(self, url):
+        url += "/random"
+        dic = {"kw": ["フロント", "深層学習"]}
+        response = requests.post(url, json.dumps(dic), headers={'Content-Type': 'application/json'})
+        print(response.headers)
+        print(response.url)
         print(response.json())
