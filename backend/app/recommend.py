@@ -24,7 +24,7 @@ with open(path_csv,"r") as fp:
 
 
 def getSentence(url):
-    if url="":
+    if url=="":
         return ""
     page = requests.get(url, verify=False)
     soup = BeautifulSoup(page.content)
