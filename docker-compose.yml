@@ -1,7 +1,5 @@
 version: '3'
-<<<<<<< HEAD
-services: 
-=======
+
 services:
   python:
     build: 
@@ -14,8 +12,7 @@ services:
       - ./backend/:/workspace/backend/
     ports:
       - "80:5001"
-  
->>>>>>> refs/remotes/origin/dev
+      
   vue:
     build:
       context: .
