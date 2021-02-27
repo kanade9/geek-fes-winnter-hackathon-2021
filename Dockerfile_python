@@ -5,6 +5,11 @@ RUN aptitude install mecab libmecab-dev mecab-ipadic-utf8 git make curl xz-utils
 ENV GIT_SSL_NO_VERIFY 1 # なんでかcloneできないので取り急ぎ。
 RUN git clone --depth 1 https://github.com/neologd/mecab-ipadic-neologd.git
 RUN echo yes | mecab-ipadic-neologd/bin/install-mecab-ipadic-neologd -n -a
+
+RUN mkdir /w2v
+WORKDIR /w2v
+RUN wget http://frt.hongo.wide.ad.jp/w2v/wiki.model http://frt.hongo.wide.ad.jp/w2v/wiki.model.trainables.syn1neg.npy http://frt.hongo.wide.ad.jp/w2v/wiki.model.wv.vectors.npy
+
 COPY ./backend/ /workspace/backend/
 COPY ./requirements.txt /workspace
 WORKDIR /workspace
