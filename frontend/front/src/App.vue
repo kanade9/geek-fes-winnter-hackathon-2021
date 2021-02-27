@@ -1,23 +1,16 @@
 <template>
   <v-app id="app">
-    <v-container>
-      <v-row align="center" wrap>
-        <v-col lg="2">
-          <v-btn small color="primary">hello</v-btn>
-        </v-col>
-      </v-row>
-    </v-container>
-    <HelloWorld msg="Welcome!!"/>
+    <Top/>
   </v-app>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import Top from './components/Top.vue'
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    Top
   }
 }
 </script>
