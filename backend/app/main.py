@@ -26,7 +26,7 @@ path_csv = os.path.join("..", 'data', 'performers_list.csv')
 dict_performers = read_ccv_to_dict(path_csv)
 n_performers = len(dict_performers)
 
-def recommedate_random(kws: list):
+def recommedate_random():
     #print(dict_performers.keys())
     uids = random.sample(dict_performers.keys(), len(dict_performers.keys()))
     return uids
@@ -73,9 +73,9 @@ def recommend():
         if not "text" in data: 
             uids = search(data['kw'])
         elif  'random' in data['kw']:
-            uids = recommedate_random(data['kw'])
+            uids = recommedate_random()
         elif data['text'] in ['random', 'らんだむ', "ランダム", "ガチャ", 'ガチャガチャ']:
-            uids = recommedate_random(data['kw'])
+            uids = recommedate_random()
         elif "text" in data and len(data['text']) > 0:  
             if data['text'] <= 1000:
                 uids = search(data['text'])
@@ -101,7 +101,7 @@ def random_choice():
             data = json.loads(data)
         else:
             data = {"kw":[]}
-        uids = recommedate_random(data['kw'])
+        uids = recommedate_random()
         info = {}
         recommend = [] 
         for i, k in enumerate(uids):
