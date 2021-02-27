@@ -64,20 +64,17 @@ def hello():
 def recommend():
     if request.method == 'POST':
         data = request.data.decode('utf-8')
-        data = json.loads(data)
         if len(data)>0:
             data = json.loads(data)
         else:
-            data = {"kw":["random"], "text":"random"}
+            data = {"text":"random"}
         # ここにレコメンドの関数を書く
         if not "text" in data: 
             uids = search(data['kw'])
-        elif  'random' in data['kw']:
-            uids = recommedate_random()
         elif data['text'] in ['random', 'らんだむ', "ランダム", "ガチャ", 'ガチャガチャ']:
             uids = recommedate_random()
         elif "text" in data and len(data['text']) > 0:  
-            if data['text'] <= 1000:
+            if len(data['text']) <= 1000:
                 uids = search(data['text'])
             else:
                 uids = search(data['text'][:1000])
