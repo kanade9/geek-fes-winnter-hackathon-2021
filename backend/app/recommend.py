@@ -68,7 +68,7 @@ def search_list(words):
     for word in words:
         v_query+=model.wv[word.lower()]
     speakers = list(urls.keys())
-    sorted(speakers, key= lambda w: getArg(getVectors()[w], v_query))
+    speakers = sorted(speakers, key= lambda w: getArg(getVectors()[w], v_query))
     return speakers
 
 def search_sentence(sentence):
