@@ -1,0 +1,8 @@
+FROM node:14.15.4-alpine3.10
+
+WORKDIR /usr/src/app/
+RUN apk update && \
+    apk add --no-cache git curl && \
+    curl -o- -L https://yarnpkg.com/install.sh | sh
+ENV PATH $HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH
+RUN yarn global add @vue/cli && yarn global add @vue/cli-init && yarn add axios vuetify sass sass-loader 
