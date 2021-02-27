@@ -1,1 +1,1 @@
-# geek_fes_winnter_hackathon_2021
+# geek-fes-winnter-hackathon-2021
