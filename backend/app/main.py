@@ -27,8 +27,8 @@ dict_performers = read_ccv_to_dict(path_csv)
 n_performers = len(dict_performers)
 
 def recommedate_random(kws: list):
-    print(dict_performers.keys())
-    uids = random.sample(dict_performers.keys(), 4)
+    #print(dict_performers.keys())
+    uids = random.sample(dict_performers.keys(), len(dict_performers.keys()))
     return uids
 
 def date_str_to_date_time(date, start_time):
@@ -47,6 +47,8 @@ def filer_by_date(recommend_infos : dict):
             info['dt'] = dt
             filtered.append(info)
             time_set.add(dt)
+        if len(filtered) >= 3:
+            break
     filtered = sorted(filtered, key=lambda x : x['dt'])
     for i in range(len(filtered)):
         del filtered[i]['dt']
@@ -70,8 +72,15 @@ def recommend():
         # ここにレコメンドの関数を書く
         if not "text" in data: 
             uids = search(data['kw'])
+        elif  'random' in data['kw']:
+            uids = recommedate_random(data['kw'])
+        elif data['text'] in ['random', 'らんだむ', "ランダム", "ガチャ", 'ガチャガチャ']:
+            uids = recommedate_random(data['kw'])
         elif "text" in data and len(data['text']) > 0:  
-            uids = search(data['text'])
+            if data['text'] <= 1000:
+                uids = search(data['text'])
+            else:
+                uids = search(data['text'][:1000])
         else:
             uids = search(data['kw'])
         info = {}
