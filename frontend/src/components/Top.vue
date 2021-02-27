@@ -6,14 +6,16 @@
     <h2 style='padding: 4rem;'>あなたにおすすめの講演はこれだ！！</h2>
     <v-container>
       <v-row align="center" wrap>
-        <v-col lg="4">
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col lg="4">
-          <div v-for="(text,key) in random_list" :key="key">
-            {{ text }}
-          </div>
+        <v-col lg="12">
+          <v-card v-for="(data,key) in random_list" :key="key" style='margin: 1rem;'>
+            <v-card-title class="justify-center" style="font-weight:bold">
+              {{ data.title}}  
+            </v-card-title>
+              <br>
+              {{ data.name }}
+              <br>
+              {{ data.start_time}} から {{ data.end_time}}
+          </v-card>
         </v-col>
       </v-row>
     </v-container>
@@ -26,7 +28,8 @@ export default {
   name: 'Top',
   data() {
     return{
-     random_list: []
+     random_list: [],
+     list_str: '{"kw": ["フロント", "深層学習"]}'
     }
   },
   props: {
@@ -34,9 +37,19 @@ export default {
   },
   methods: {
     post_random: async function () {
-      await axios.post('http://localhost:80/random', JSON.stringify('{"kw": ["フロント", "深層学習"]}'), {
+      await axios.post('http://localhost/random', this.list_str, {
         headers: {"Content-Type": "application/json"}
       })
+      .then(response => {
+        // alert(response.data);
+        this.random_list = response.data;
+        })
+      .catch(error => {
+        alert(error);
+        })
+      },
+    get_random: async function () {
+      await axios.get('http://localhost/')
       .then(response => {
         alert(response.statusText);
         })

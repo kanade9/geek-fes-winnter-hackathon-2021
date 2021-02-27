@@ -20,6 +20,6 @@ services:
     container_name: vue_container
     tty: true
     volumes:
-      - ./:/usr/src/app/frontend
+      - ./:/usr/src/app
     ports:
       - "8080:8080"
