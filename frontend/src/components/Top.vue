@@ -10,9 +10,9 @@
         </v-col>
       </v-row>
       <v-row>
-        <v-col lg="4">
-          <div v-for="(text,key) in random_list" :key="key">
-            {{ text }}
+        <v-col lg="10">
+          <div v-for="(data,key) in random_list" :key="key">
+            {{ data.name }} {{ data.title}} {{ data.start_time}} {{ data.end_time}}
           </div>
         </v-col>
       </v-row>
@@ -26,7 +26,8 @@ export default {
   name: 'Top',
   data() {
     return{
-     random_list: []
+     random_list: [],
+     list_str: '{"kw": ["フロント", "深層学習"]}'
     }
   },
   props: {
@@ -34,9 +35,19 @@ export default {
   },
   methods: {
     post_random: async function () {
-      await axios.post('http://localhost:80/random', JSON.stringify('{"kw": ["フロント", "深層学習"]}'), {
+      await axios.post('http://localhost/random', this.list_str, {
         headers: {"Content-Type": "application/json"}
       })
+      .then(response => {
+        // alert(response.data);
+        this.random_list = response.data;
+        })
+      .catch(error => {
+        alert(error);
+        })
+      },
+    get_random: async function () {
+      await axios.get('http://localhost/')
       .then(response => {
         alert(response.statusText);
         })
