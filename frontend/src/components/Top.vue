@@ -6,14 +6,16 @@
     <h2 style='padding: 4rem;'>あなたにおすすめの講演はこれだ！！</h2>
     <v-container>
       <v-row align="center" wrap>
-        <v-col lg="4">
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col lg="10">
-          <div v-for="(data,key) in random_list" :key="key">
-            {{ data.name }} {{ data.title}} {{ data.start_time}} {{ data.end_time}}
-          </div>
+        <v-col lg="12">
+          <v-card v-for="(data,key) in random_list" :key="key" style='margin: 1rem;'>
+            <v-card-title class="justify-center" style="font-weight:bold">
+              {{ data.title}}  
+            </v-card-title>
+              <br>
+              {{ data.name }}
+              <br>
+              {{ data.start_time}} から {{ data.end_time}}
+          </v-card>
         </v-col>
       </v-row>
     </v-container>

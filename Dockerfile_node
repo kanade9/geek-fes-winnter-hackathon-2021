@@ -6,4 +6,5 @@ RUN apk update && \
     curl -o- -L https://yarnpkg.com/install.sh | sh
 ENV PATH $HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH
 RUN yarn global add @vue/cli && yarn global add @vue/cli-init && yarn add axios vuetify sass sass-loader
-RUN 
+RUN cd frontend
+RUN yarn && yarn serve
