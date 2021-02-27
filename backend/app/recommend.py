@@ -5,7 +5,7 @@ import subprocess
 from gensim.models import Word2Vec
 from functools import lru_cache
 import numpy as np
-
+requests.packages.urllib3.util.ssl_.DEFAULT_CIPHERS += "HIGH:!DH:!aNULL"#とてもよくない！！！ define hellmanに脆弱性がみつかったのでrequestsが(opensslが?)なんかアップデートされたらしく動かなくなったので、強制的に無視。
 cmd = 'echo `mecab-config --dicdir`"/mecab-ipadic-neologd"'
 path = (subprocess.Popen(cmd, stdout=subprocess.PIPE,
                            shell=True).communicate()[0]).decode('utf-8')
@@ -26,7 +26,7 @@ urls = {
 }
 
 def getSentence(url):
-    page = requests.get(url)
+    page = requests.get(url, verify=False)
     soup = BeautifulSoup(page.content)
     texts = [s.getText().strip() for s in soup.find_all("p")]
     return texts
