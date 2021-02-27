@@ -61,7 +61,7 @@ export default {
     post_random: async function () {
       let text_json_str = '{"text":' + '"' + this.text + '"}';
       await axios
-        .post("http://localhost/random", text_json_str, {
+        .post("http://localhost/recommend", text_json_str, {
           headers: { "Content-Type": "application/json" },
         })
         .then((response) => {
