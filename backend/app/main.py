@@ -5,6 +5,7 @@ import os
 import random
 import datetime
 from flask_cors import CORS
+from  recommend import search
 
 
 
@@ -43,9 +44,14 @@ def filer_by_date(recommend_infos : dict):
     for info in recommend_infos:
         dt = date_str_to_date_time(info['date'], info['start_time'])
         if not dt in time_set and dt >= dt_now:
+            info['dt'] = dt
             filtered.append(info)
             time_set.add(dt)
+    filtered = sorted(filtered, key=lambda x : x['dt'])
+    for i in range(len(filtered)):
+        del filtered[i]['dt']
     return filtered 
+
 
 @app.route("/")
 def hello():
@@ -57,7 +63,25 @@ def recommend():
     if request.method == 'POST':
         data = request.data.decode('utf-8')
         data = json.loads(data)
-        uids = recommedate_random(data['kw'])
+        if len(data)>0:
+            data = json.loads(data)
+        else:
+            data = {"kw":["random"], "text":"random"}
+        # ここにレコメンドの関数を書く
+        if not "text" in data: 
+            uids = search(data['kw'])
+        elif "text" in data and len(data['text']) > 0:  
+            uids = search(data['text'])
+        else:
+            uids = search(data['kw'])
+        info = {}
+        recommend = [] 
+        for i, k in enumerate(uids):
+            recommend.append( dict_performers[k] )
+        recommend = filer_by_date(recommend) # 貪欲に時間が重なっているものを削除する
+        info = { i:info for  i , info in enumerate( recommend) }  
+        print(info)
+        return jsonify(info)
 
 
 @app.route("/random", methods=["POST"])
