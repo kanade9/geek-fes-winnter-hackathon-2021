@@ -14,7 +14,8 @@
               <br>
               {{ data.name }}
               <br>
-              {{ data.start_time}} から {{ data.end_time}}
+              {{ data.start_time}} から {{ data.end_time}} 会場: {{ data.hall_no}}
+              <br>
           </v-card>
         </v-col>
       </v-row>
