@@ -18,7 +18,7 @@
             <v-textarea counter dark outlined v-model="text"></v-textarea>
           </v-row>
           <v-row>
-            <v-btn elevation="5" large color="success" @click="post_debug()">検索する</v-btn>
+            <v-btn elevation="5" large color="success" @click="post_recommend()">検索する</v-btn>
           </v-row>
         </v-col>
         <v-spacer/>
@@ -28,6 +28,7 @@
             :key="key"
             style="margin: 1rem"
             outlined
+            elevetion=10
           >
             <v-card-title class="justify-center" style="font-weight: bold">
               {{ data.title }}
@@ -42,6 +43,7 @@
             {{ data.start_time }} から {{ data.end_time }} 会場:
             {{ data.hall_no }}
             <br />
+            <a v-bind:href="data.twitter">{{data.twitter}}</a>
           </v-card>
         </v-col>
       </v-row>
