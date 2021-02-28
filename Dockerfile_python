@@ -1,0 +1,12 @@
+FROM python:3.8
+
+RUN apt update && apt upgrade -y && apt install -y aptitude swig libssl-dev sudo
+RUN aptitude install libmecab-dev git make curl xz-utils file -y
+
+COPY ./backend/ /workspace/backend/
+COPY ./requirements.txt /workspace
+WORKDIR /workspace
+RUN pip install -r requirements.txt
+# RUN python -m spacy download ja_core_news_sm
+WORKDIR /workspace/backend/app
+CMD ["python","main.py"]
