@@ -16,7 +16,9 @@ m = MeCab.Tagger("-d {0} -Owakati".format(path))
 path_csv = os.path.join("..", 'data', 'performers_list.csv')
 urls={}
 with open(path_csv,"r") as fp:
-    for line in fp:
+    for i,line in enumerate(fp):
+        if i==0:
+            continue
         line=line.strip().split(",")
         uid=line[0]
         _urls=line[9:]
@@ -24,12 +26,16 @@ with open(path_csv,"r") as fp:
 
 
 def getSentence(url):
-    if url="":
+    if url=="":
         return ""
-    page = requests.get(url, verify=False)
-    soup = BeautifulSoup(page.content)
-    texts = [s.getText().strip() for s in soup.find_all("p")]
-    return texts
+    try:
+        page = requests.get(url)
+        soup = BeautifulSoup(page.content, "html.parser")
+        texts = [s.getText().strip() for s in soup.find_all("p")]
+        return texts
+    except:
+        print("Error",url)
+        return ""
 
 
 d={}
@@ -40,6 +46,7 @@ for key in urls:
     d[key]=retval
 
 model = Word2Vec.load("/w2v/wiki.model")
+
 def getArg(v1,v2):
     return np.dot(v1,v2)/(np.linalg.norm(v1, ord=2)*np.linalg.norm(v2, ord=2))
 @lru_cache()
@@ -56,13 +63,24 @@ def getVectors():
                     print(word)
     return c
 
-def search(words):
+def search_list(words):
     v_query = np.zeros(200,)
     for word in words:
         v_query+=model.wv[word.lower()]
     speakers = list(urls.keys())
-    sorted(speakers, key= lambda w: getArg(getVectors()[w], v_query))
+    speakers = sorted(speakers, key= lambda w: getArg(getVectors()[w], v_query))
     return speakers
+
+def search_sentence(sentence):
+    words = m.parse(sentence).strip().split(" ")
+    return search_list(words)
+
+def search(x):
+    if type(x)==list:
+        return search_list(x)
+    else:
+        return search_sentence(x)
 
 if __name__ == '__main__':
     print(search(["ウェブ","人工知能","DX"]))
+    print(search("私は人工知能に興味があります"))

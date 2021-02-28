@@ -5,6 +5,7 @@ import os
 import random
 import datetime
 from flask_cors import CORS
+from  recommend import search
 
 
 
@@ -25,9 +26,9 @@ path_csv = os.path.join("..", 'data', 'performers_list.csv')
 dict_performers = read_ccv_to_dict(path_csv)
 n_performers = len(dict_performers)
 
-def recommedate_random(kws: list):
-    print(dict_performers.keys())
-    uids = random.sample(dict_performers.keys(), 4)
+def recommedate_random():
+    #print(dict_performers.keys())
+    uids = random.sample(dict_performers.keys(), len(dict_performers.keys()))
     return uids
 
 def date_str_to_date_time(date, start_time):
@@ -43,9 +44,16 @@ def filer_by_date(recommend_infos : dict):
     for info in recommend_infos:
         dt = date_str_to_date_time(info['date'], info['start_time'])
         if not dt in time_set and dt >= dt_now:
+            info['dt'] = dt
             filtered.append(info)
             time_set.add(dt)
+        if len(filtered) >= 3:
+            break
+    filtered = sorted(filtered, key=lambda x : x['dt'])
+    for i in range(len(filtered)):
+        del filtered[i]['dt']
     return filtered 
+
 
 @app.route("/")
 def hello():
@@ -56,8 +64,30 @@ def hello():
 def recommend():
     if request.method == 'POST':
         data = request.data.decode('utf-8')
-        data = json.loads(data)
-        uids = recommedate_random(data['kw'])
+        if len(data)>0:
+            data = json.loads(data)
+        else:
+            data = {"text":"random"}
+        # ここにレコメンドの関数を書く
+        if not "text" in data: 
+            uids = search(data['kw'])
+        elif data['text'] in ['random', 'らんだむ', "ランダム", "ガチャ", 'ガチャガチャ']:
+            uids = recommedate_random()
+        elif "text" in data and len(data['text']) > 0:  
+            if len(data['text']) <= 1000:
+                uids = search(data['text'])
+            else:
+                uids = search(data['text'][:1000])
+        else:
+            uids = search(data['kw'])
+        info = {}
+        recommend = [] 
+        for i, k in enumerate(uids):
+            recommend.append( dict_performers[k] )
+        recommend = filer_by_date(recommend) # 貪欲に時間が重なっているものを削除する
+        info = { i:info for  i , info in enumerate( recommend) }  
+        print(info)
+        return jsonify(info)
 
 
 @app.route("/random", methods=["POST"])
@@ -68,7 +98,7 @@ def random_choice():
             data = json.loads(data)
         else:
             data = {"kw":[]}
-        uids = recommedate_random(data['kw'])
+        uids = recommedate_random()
         info = {}
         recommend = [] 
         for i, k in enumerate(uids):
