@@ -8,6 +8,7 @@ import json
 import os
 from collections import defaultdict
 
+
 nlp = spacy.load('ja_ginza')  
 
 path_csv = os.path.join("..", 'data', 'performers_list.csv')
@@ -79,17 +80,31 @@ for key in urls:
         except:
             pass
 
-def userdoc_tf_idf_vec(userdoc):
-    vec = np.zeros(300,)
+for k in urls:
+    spacy_doc_dict[k]['vector'] = []
+    for doc, tf in zip(spacy_doc_dict[k]['article'], spacy_doc_dict[k]['tf']):
+        vec_text = np.zeros(300)
+        for t in doc:
+            vec_text += t.vector * tf[str(t)] * idf(str(t))
+        spacy_doc_dict[k]['vector'].append(vec_text)
+
+
+def make_tf(userdoc):
     tf = defaultdict(lambda :0)
     for t in userdoc:
         tf[str(t)] += 1 / (len(userdoc)+1)
+    return tf
+
+def userdoc_tf_idf_vec(userdoc):
+    vec = np.zeros(300,)
+    tf = make_tf(userdoc)
     for t in userdoc:
         vec += t.vector * tf[str(t)] * idf(str(t))
     return vec
 
 def getArg(v1,v2):
-    return np.dot(v1,v2)/(np.linalg.norm(v1, ord=2)*np.linalg.norm(v2, ord=2))
+    return  np.dot(v1,v2)/ (np.max([1e-7, np.linalg.norm(v1, ord=2)]) * np.max([1e-7, np.linalg.norm(v2, ord=2)])) 
+    
     
 @lru_cache()
 def getVectors():
@@ -105,23 +120,29 @@ def getVectors():
 def search_list(words):
     return search_sentence(" ".join(words))
 
+
 def get_similarity(uid, userdoc):
     cos_sim = [] 
     similarity = 0
     vec_user =userdoc_tf_idf_vec(userdoc) 
-    for doc, tf in zip(spacy_doc_dict[uid]['article'], spacy_doc_dict[uid]['tf']):
-        vec_text = np.zeros(300)
-        for t in doc:
-            vec_text += t.vector * tf[str(t)] * idf(str(t))
+    for vec_text in spacy_doc_dict[uid]['vector']:
         cos_sim.append(getArg(vec_text, vec_user))
     if len(cos_sim)>0:
-        similarity =  np.max(cos_sim) * 0.5
+        similarity =  np.max(cos_sim) 
+        # print(f"uid={uid}, name={names[uid]} word_vec_article={similarity}")
     else:
         similarity = -1
-    similarity += max( getArg(userdoc_tf_idf_vec(spacy_doc_dict[uid]['title']), vec_user), 0 )
+    similarity_title = max( getArg(userdoc_tf_idf_vec(spacy_doc_dict[uid]['title']), vec_user), 0 )
+    similarity += similarity_title
+    # print(f"uid={uid}, name={names[uid]} word_vec_title={similarity_title}")
 
-    similarity += count_named_entity(uid, userdoc)
-    similarity += count_common_words(uid, userdoc) 
+
+    similarity_count_named = count_named_entity(uid, userdoc)
+    # print(f"uid={uid}, name={names[uid]} named_entity={similarity_count_named}")
+    similarity += similarity_count_named
+    similarity_count_common = count_common_words(uid, userdoc) 
+    # print(f"uid={uid}, name={names[uid]} common_words={similarity_count_common}")
+    similarity += similarity_count_common
     return similarity 
 
 def count_common_words(uid, userdoc):
@@ -129,10 +150,10 @@ def count_common_words(uid, userdoc):
     counter = {}
     for token in userdoc:
         counter[str(token)] = 0
-        for doc in spacy_doc_dict[uid]['article']:
+        for doc, tf  in zip( spacy_doc_dict[uid]['article'], spacy_doc_dict[uid]['tf'] ):
             for t in doc:
                 if str(t) == str(token) :
-                    counter[str(token)] += 1
+                    counter[str(token)] += tf[str(t)] * idf(str(t))
         total_count += counter[str(token)]
     if len(counter) > 0:
         return total_count / len(counter)
@@ -179,7 +200,10 @@ def count_named_entity(uid, userdoc):
 def search_sentence(sentence):
     doc_query = nlp(sentence)
     speakers = list(urls.keys())
-    speakers = sorted(speakers, key= lambda w: get_similarity(w, doc_query), reverse=True)
+    dict_sim = {uid: get_similarity(uid, doc_query) for uid in speakers}
+    speakers = sorted(speakers, key= lambda w:dict_sim[w], reverse=True)
+    #for k in speakers:
+    #    print(f"{k}= {dict_sim[k]}")
     return speakers
 
 def search(x):
