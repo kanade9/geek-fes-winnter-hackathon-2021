@@ -12,6 +12,8 @@ nlp = spacy.load('ja_ginza')
 path_csv = os.path.join("..", 'data', 'performers_list.csv')
 urls={}
 names = {}
+titles = {}
+positons={}
 with open(path_csv,"r") as fp:
     for i,line in enumerate(fp):
         if i==0:
@@ -19,6 +21,8 @@ with open(path_csv,"r") as fp:
         line=line.strip().split(",")
         uid=line[0]
         names[uid] = line[1]
+        titles[uid] = line[7]
+        positons[uid] = line[2]
         _urls=line[9:]
         urls[uid]=_urls
 
@@ -43,11 +47,11 @@ for key in urls:
     for l in urls[key]:
         retval+=getSentence(l)#毎回アクセスするの迷惑なので、そのうちキャッシュする。
     d[key]=retval
-    spacy_doc_dict[key] = []
+    spacy_doc_dict[key] = {"article":[], 'title':nlp(titles[key]), 'name': nlp(names[key]), 'position':nlp(positons[key])}
     for text in retval:
         try :
             doc = nlp(text)
-            spacy_doc_dict[key].append(doc)
+            spacy_doc_dict[key]['article'].append(doc)
         except:
             pass
 
@@ -71,12 +75,63 @@ def search_list(words):
 
 def get_similarity(uid, userdoc):
     cos_sim = [] 
-    for doc in spacy_doc_dict[uid]:
+    similarity = 0
+    for doc in spacy_doc_dict[uid]['article']:
         cos_sim.append(doc.similarity(userdoc))
     if len(cos_sim)>0:
-        return max(cos_sim)
+        similarity =  max(cos_sim)
     else:
-        return -1
+        similarity = -1
+    similarity += max( spacy_doc_dict[uid]['title'].similarity(userdoc), 0 )
+    similarity += max( spacy_doc_dict[uid]['name'].similarity(userdoc), 0 )
+    similarity += max( spacy_doc_dict[uid]['position'].similarity(userdoc), 0 )
+
+    similarity += count_named_entity(uid, userdoc)
+    similarity += count_unvector_common_words(uid, userdoc) + 0.5
+    return similarity 
+
+def count_common_words(uid, userdoc):
+    total_count = 0
+    counter = {}
+    for token in userdoc:
+        counter[str(token)] = 0
+        for doc in spacy_doc_dict[uid]['article']:
+            for t in doc:
+                if str(t) == str(token) :
+                    counter[str(token)] += 1
+        total_count += counter[str(token)]
+    if len(counter) > 0:
+        return total_count / len(counter)
+    else:
+        return 0
+
+def count_unvector_common_words(uid, userdoc):
+    total_count = 0
+    counter = {}
+    for token in userdoc:
+        if not token.has_vector:
+            counter[str(token)] = 0
+            for doc in spacy_doc_dict[uid]['article']:
+                for t in  doc:
+                    if str(t) == str(token) :
+                        counter[str(token)] += 1
+            total_count += counter[str(token)]
+    if len(counter) > 0:
+        return total_count / len(counter)
+    else:
+        return 0
+
+def count_named_entity(uid, userdoc):
+    total_count = 0
+    counter = {}
+    for token in userdoc.ents:
+        counter[str(token)] = 0
+        for doc in spacy_doc_dict[uid]['article']:
+            for t in  doc.ents:
+                if str(t) == str(token) :
+                    counter[str(token)] += 1
+        total_count += counter[str(token)]
+    return total_count
 
 def search_sentence(sentence):
     doc_query = nlp(sentence)
@@ -106,6 +161,19 @@ if __name__ == '__main__':
     print([names[k] for k in result])
 
     q = "私はRubyに興味があります"
+    print(q)
+    result= search(q)
+    print(result)
+    print([names[k] for k in result])
+
+    q = "Ruby"
+    print(q)
+    result= search(q)
+    print(result)
+    print([names[k] for k in result])
+
+
+    q = "東京大学"  
     print(q)
     result= search(q)
     print(result)
