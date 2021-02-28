@@ -10,9 +10,8 @@ services:
     tty: true
     volumes:
       - ./backend/:/workspace/backend/
-    #ports:
-      #- "80:5001"
-      
+    ports:
+      - "80:5001"
   vue:
     build:
       context: .
