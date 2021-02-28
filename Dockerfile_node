@@ -8,5 +8,5 @@ ENV PATH $HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH
 RUN yarn global add @vue/cli && yarn global add @vue/cli-init && yarn add axios vuetify sass sass-loader
 WORKDIR /usr/src/app/frontend
 RUN yarn
-CMD yarn serve
+#CMD yarn serve
 
