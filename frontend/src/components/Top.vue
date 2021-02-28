@@ -2,7 +2,7 @@
   <div class="top">
     <v-container>
       <v-row style="padding-top:100px;">
-        <v-col lg="5">
+        <v-col cols="12" lg="5" style="padding:20px">
           <v-row>
             <h1>技育祭おすすめ講演</h1>
             <br />
@@ -18,7 +18,7 @@
             <v-textarea counter dark outlined v-model="text"></v-textarea>
           </v-row>
           <v-row>
-            <v-btn elevation="5" large color="success" @click="post_recommend()">検索する</v-btn>
+            <v-btn elevation="5" large color="success" @click="post_debug()">検索する</v-btn>
           </v-row>
         </v-col>
         <v-spacer/>
@@ -32,11 +32,13 @@
             <v-card-title class="justify-center" style="font-weight: bold">
               {{ data.title }}
             </v-card-title>
-            <img src='../assets/image/0.jpg'>
             <v-card-subtitle>
               {{ data.name }}
             </v-card-subtitle>
-            <br />
+            <span>
+             {{ data.date }}
+            </span>
+            <br>
             {{ data.start_time }} から {{ data.end_time }} 会場:
             {{ data.hall_no }}
             <br />
@@ -85,8 +87,11 @@ export default {
           alert(error);
         });
     },
-  },
-};
+    getPic(index) {
+    return '../assets/image' + index + '.jpg';
+    }
+  }
+}
 </script>
 
 <style>
