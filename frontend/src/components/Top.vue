@@ -18,7 +18,7 @@
             <v-textarea counter dark outlined v-model="text"></v-textarea>
           </v-row>
           <v-row>
-            <v-btn elevation="5" large color="success" @click="post_recommend()">検索する</v-btn>
+            <v-btn elevation="5" large color="success" @click="post_debug()">検索する</v-btn>
           </v-row>
         </v-col>
         <v-spacer/>
@@ -32,11 +32,13 @@
             <v-card-title class="justify-center" style="font-weight: bold">
               {{ data.title }}
             </v-card-title>
-            <img src='../assets/image/0.jpg'>
             <v-card-subtitle>
               {{ data.name }}
             </v-card-subtitle>
-            <br />
+            <span>
+             {{ data.date }}
+            </span>
+            <br>
             {{ data.start_time }} から {{ data.end_time }} 会場:
             {{ data.hall_no }}
             <br />
@@ -78,8 +80,11 @@ export default {
     post_debug: function () {
       this.random_list = dataset;
     },
-  },
-};
+    getPic(index) {
+    return '../assets/image' + index + '.jpg';
+    }
+  }
+}
 </script>
 
 <style>
