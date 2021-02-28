@@ -1,6 +1,17 @@
 version: '3'
 
 services:
+  python:
+    build: 
+      context: .
+      dockerfile: Dockerfile_python
+    image: python_img
+    container_name: python_container
+    tty: true
+    volumes:
+      - ./backend/:/workspace/backend/
+    ports:
+      - "80:5001"
   vue:
     build:
       context: .

@@ -2,7 +2,7 @@
   <div class="top">
     <v-container>
       <v-row style="padding-top:100px;">
-        <v-col lg="5">
+        <v-col cols="12" lg="5" style="padding:20px">
           <v-row>
             <h1>技育祭おすすめ講演</h1>
             <br />
