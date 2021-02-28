@@ -1,18 +1,18 @@
 <template>
-  <v-app id="app">
-    <Top/>
-  </v-app>
+    <v-app>
+      <Top />
+    </v-app>
 </template>
 
 <script>
-import Top from './components/Top.vue'
+import Top from "./components/Top.vue";
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
-    Top
-  }
-}
+    Top,
+  },
+};
 </script>
 
 <style>
@@ -22,6 +22,8 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+  /* margin-top: 60px; */
+  background-image: url("~@/assets/pg3.png");
+  height: 100%;
 }
 </style>
