@@ -121,7 +121,7 @@ def get_similarity(uid, userdoc):
     similarity += max( getArg(userdoc_tf_idf_vec(spacy_doc_dict[uid]['title']), vec_user), 0 )
 
     similarity += count_named_entity(uid, userdoc)
-    similarity += count_unvector_common_words(uid, userdoc) 
+    similarity += count_common_words(uid, userdoc) 
     return similarity 
 
 def count_common_words(uid, userdoc):
