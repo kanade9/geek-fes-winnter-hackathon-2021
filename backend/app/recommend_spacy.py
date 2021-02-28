@@ -1,26 +1,24 @@
 from bs4 import BeautifulSoup
 import requests
-import MeCab
 import subprocess
-from gensim.models import Word2Vec
+import spacy
 from functools import lru_cache
 import numpy as np
 import json
 import os
-requests.packages.urllib3.util.ssl_.DEFAULT_CIPHERS += "HIGH:!DH:!aNULL"#とてもよくない！！！ define hellmanに脆弱性がみつかったのでrequestsが(opensslが?)なんかアップデートされたらしく動かなくなったので、強制的に無視。
-cmd = 'echo `mecab-config --dicdir`"/mecab-ipadic-neologd"'
-path = (subprocess.Popen(cmd, stdout=subprocess.PIPE,
-                           shell=True).communicate()[0]).decode('utf-8')
-m = MeCab.Tagger("-d {0} -Owakati".format(path))
+
+nlp = spacy.load('ja_ginza')  
 
 path_csv = os.path.join("..", 'data', 'performers_list.csv')
 urls={}
+names = {}
 with open(path_csv,"r") as fp:
     for i,line in enumerate(fp):
         if i==0:
             continue
         line=line.strip().split(",")
         uid=line[0]
+        names[uid] = line[1]
         _urls=line[9:]
         urls[uid]=_urls
 
@@ -39,41 +37,52 @@ def getSentence(url):
 
 
 d={}
+spacy_doc_dict = {}
 for key in urls:
     retval = []
     for l in urls[key]:
         retval+=getSentence(l)#毎回アクセスするの迷惑なので、そのうちキャッシュする。
     d[key]=retval
+    spacy_doc_dict[key] = []
+    for text in retval:
+        try :
+            doc = nlp(text)
+            spacy_doc_dict[key].append(doc)
+        except:
+            pass
 
-model = Word2Vec.load("/w2v/wiki.model")
 
 def getArg(v1,v2):
     return np.dot(v1,v2)/(np.linalg.norm(v1, ord=2)*np.linalg.norm(v2, ord=2))
+    
 @lru_cache()
 def getVectors():
     c = {}
     for key in d:
-        c[key]=np.zeros(200,)
+        c[key]=np.zeros(100,)
         for s in d[key]:
-            words = m.parse(s).strip().split(" ")
-            for word in words:
-                try:
-                    c[key] += model.wv[word.lower()]
-                except KeyError:
-                    print(word)
+            doc = nlp(s)
+            for token in doc:
+                c[key] += token.vector
     return c
 
 def search_list(words):
-    v_query = np.zeros(200,)
-    for word in words:
-        v_query+=model.wv[word.lower()]
-    speakers = list(urls.keys())
-    speakers = sorted(speakers, key= lambda w: getArg(getVectors()[w], v_query))
-    return speakers
+    return search_sentence(" ".join(words))
+
+def get_similarity(uid, userdoc):
+    cos_sim = [] 
+    for doc in spacy_doc_dict[uid]:
+        cos_sim.append(doc.similarity(userdoc))
+    if len(cos_sim)>0:
+        return max(cos_sim)
+    else:
+        return -1
 
 def search_sentence(sentence):
-    words = m.parse(sentence).strip().split(" ")
-    return search_list(words)
+    doc_query = nlp(sentence)
+    speakers = list(urls.keys())
+    speakers = sorted(speakers, key= lambda w: get_similarity(w, doc_query), reverse=True)
+    return speakers
 
 def search(x):
     if type(x)==list:
@@ -82,5 +91,22 @@ def search(x):
         return search_sentence(x)
 
 if __name__ == '__main__':
-    print(search(["ウェブ","人工知能","DX"]))
-    print(search("私は人工知能に興味があります"))
+    q = ["ウェブ","人工知能","DX"]
+    print(q)
+    result= search(q)
+    print(result)
+    print([names[k] for k in result])
+
+
+
+    q = "私は人工知能に興味があります"
+    print(q)
+    result= search(q)
+    print(result)
+    print([names[k] for k in result])
+
+    q = "私はRubyに興味があります"
+    print(q)
+    result= search(q)
+    print(result)
+    print([names[k] for k in result])
