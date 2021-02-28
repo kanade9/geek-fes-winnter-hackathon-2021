@@ -55,10 +55,13 @@ for key in urls:
     for l in urls[key]:
         retval+=getSentence(l)#毎回アクセスするの迷惑なので、そのうちキャッシュする。
     d[key]=retval
-    spacy_doc_dict[key] = {"article":[], 'title':nlp(titles[key]), 
-        'name': nlp(names[key]), 'position':nlp(positons[key]),
-         'tf':[],
-         }
+    spacy_doc_dict[key] = {"article":[], 'tf':[],}
+    for tag in ['title', 'position', 'name']:
+        try:
+            spacy_doc_dict[key][tag]  = nlp(titles[key])
+        except:
+            spacy_doc_dict[key][tag] =  nlp("プログラミング")
+    
     for text in retval:
         try :
             n_all_text +=1
@@ -112,7 +115,7 @@ def get_similarity(uid, userdoc):
             vec_text += t.vector * tf[str(t)] * idf(str(t))
         cos_sim.append(getArg(vec_text, vec_user))
     if len(cos_sim)>0:
-        similarity =  np.max(cos_sim)
+        similarity =  np.max(cos_sim) * 0.5
     else:
         similarity = -1
     similarity += max( getArg(userdoc_tf_idf_vec(spacy_doc_dict[uid]['title']), vec_user), 0 )
