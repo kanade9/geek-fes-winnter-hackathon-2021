@@ -18,6 +18,8 @@
             <v-textarea counter dark outlined v-model="text"></v-textarea>
           </v-row>
           <v-row>
+          </v-row>
+          <v-row>
             <v-btn elevation="5" large color="success" @click="post_recommend()">検索する</v-btn>
           </v-row>
         </v-col>
@@ -62,10 +64,15 @@ export default {
       random_list: [],
       dataset: dataset,
       list_str: '{"kw": ["フロント", "深層学習"]}',
+      word_chip: ['python','セキュリティ'],
     };
   },
   methods: {
     post_recommend: async function () {
+      if(this.text===""){
+        alert('文章を入力してください');
+        return;
+      }
       let text_json_str = '{"text":' + '"' + this.text + '"}';
       await axios
         .post("http://localhost/recommend", text_json_str, {
