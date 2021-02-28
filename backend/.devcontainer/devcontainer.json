@@ -3,8 +3,8 @@
 {
 	"name": "flask_be",
 	"build": {
-		"dockerfile": "../Dockerfile",
-		"context": "..",
+		"dockerfile": "../../Dockerfile",
+		"context": "../..",
 	},
 
 	// Set *default* container specific settings.json values on container create.

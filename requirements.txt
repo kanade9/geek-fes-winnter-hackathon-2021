@@ -5,3 +5,5 @@ mecab-python3==0.996.3
 gensim==3.8.3
 numpy==1.20.1
 Flask-Cors==3.0.10
+ginza==4.0.5
+spacy

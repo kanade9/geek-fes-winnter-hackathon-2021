@@ -5,7 +5,7 @@ import os
 import random
 import datetime
 from flask_cors import CORS
-from  recommend import search
+from  recommend_spacy import search
 
 
 
@@ -17,7 +17,7 @@ def read_ccv_to_dict(path: str):
             #rowはdictionary
             #row["column_name"] or row.get("column_name")で必要な項目を取得することができる
             # print(row)
-            dic_performers[row["UID"]] = {k:row[k] for k in row.keys() if k != "UID"}
+            dic_performers[row["UID"]] = {k:row[k] for k in row.keys() }
     return dic_performers
 
 app = Flask(__name__)
