@@ -11,7 +11,7 @@ from  recommend import search
 
 def read_ccv_to_dict(path: str):
     dic_performers = {}
-    with open(path, "r") as f : 
+    with open(path, "r") as f :
         d = csv.DictReader(f)
         for row in d:
             #rowはdictionary
@@ -40,7 +40,7 @@ def filer_by_date(recommend_infos : dict):
     # 貪欲に時間が重なっているものを削除する
     filtered  = []
     time_set = set()
-    dt_now = datetime.datetime.now() 
+    dt_now = datetime.datetime.now()
     for info in recommend_infos:
         dt = date_str_to_date_time(info['date'], info['start_time'])
         if not dt in time_set and dt >= dt_now:
@@ -52,12 +52,12 @@ def filer_by_date(recommend_infos : dict):
     filtered = sorted(filtered, key=lambda x : x['dt'])
     for i in range(len(filtered)):
         del filtered[i]['dt']
-    return filtered 
+    return filtered
 
 
 @app.route("/")
 def hello():
-    return "Hello World from Flask"
+    return "Access not allowed"
 
 
 @app.route("/recommend", methods=["POST"])
@@ -69,11 +69,11 @@ def recommend():
         else:
             data = {"text":"random"}
         # ここにレコメンドの関数を書く
-        if not "text" in data: 
+        if not "text" in data:
             uids = search(data['kw'])
         elif data['text'] in ['random', 'らんだむ', "ランダム", "ガチャ", 'ガチャガチャ']:
             uids = recommedate_random()
-        elif "text" in data and len(data['text']) > 0:  
+        elif "text" in data and len(data['text']) > 0:
             if len(data['text']) <= 1000:
                 uids = search(data['text'])
             else:
@@ -81,11 +81,11 @@ def recommend():
         else:
             uids = search(data['kw'])
         info = {}
-        recommend = [] 
+        recommend = []
         for i, k in enumerate(uids):
             recommend.append( dict_performers[k] )
         recommend = filer_by_date(recommend) # 貪欲に時間が重なっているものを削除する
-        info = { i:info for  i , info in enumerate( recommend) }  
+        info = { i:info for  i , info in enumerate( recommend) }
         print(info)
         return jsonify(info)
 
@@ -100,11 +100,11 @@ def random_choice():
             data = {"kw":[]}
         uids = recommedate_random()
         info = {}
-        recommend = [] 
+        recommend = []
         for i, k in enumerate(uids):
             recommend.append( dict_performers[k] )
         recommend = filer_by_date(recommend) # 貪欲に時間が重なっているものを削除する
-        info = { i:info for  i , info in enumerate( recommend) }  
+        info = { i:info for  i , info in enumerate( recommend) }
         print(info)
         return jsonify(info)
 
@@ -117,11 +117,11 @@ def return_chokudai():
         else:
             data = {"kw":[]}
         info_chokudai = {
-                "name":"高橋 直大", 
+                "name":"高橋 直大",
                 "postion":"AtCoder株式会社 代表取締役社長",
-                "start_time":"15:50", 
+                "start_time":"15:50",
                 "end_time":"16:50",
-                "title":"RedCoderのライブ競プロ～競プロ世界ランカーのアルゴリズム改善～", 
+                "title":"RedCoderのライブ競プロ～競プロ世界ランカーのアルゴリズム改善～",
                 "twitter":"https://twitter.com/chomado" ,
             }
         chokudai_dict = { i:info_chokudai for i in range(3) }
@@ -131,4 +131,4 @@ def return_chokudai():
 
 if __name__ == "__main__":
     # Only for debugging while developing
-    app.run(host='0.0.0.0', debug=True, port=5001)
+    app.run(host='0.0.0.0', debug=False, port=5000)

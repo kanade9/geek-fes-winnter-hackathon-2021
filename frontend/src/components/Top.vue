@@ -61,7 +61,7 @@ export default {
     post_random: async function () {
       let text_json_str = '{"text":' + '"' + this.text + '"}';
       await axios
-        .post("http://localhost/recommend", text_json_str, {
+        .post("http://frt.hongo.wide.ad.jp:5000/recommend", text_json_str, {
           headers: { "Content-Type": "application/json" },
         })
         .then((response) => {
@@ -74,7 +74,7 @@ export default {
     },
     get_random: async function () {
       await axios
-        .get("http://localhost/")
+        .get("http://frt.hongo.wide.ad.jp:5000/")
         .then((response) => {
           alert(response.statusText);
         })
